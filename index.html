@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YT Downloader - 1080p Videos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            color: #FF0000;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 18px 20px 18px 50px;
+            border: 2px solid #e1e5e9;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .url-input:focus {
+            border-color: #FF0000;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-size: 18px;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #FF0000, #CC0000);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 0, 0, 0.3);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        .quality-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .quality-btn {
+            padding: 10px 20px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .quality-btn.active,
+        .quality-btn:hover {
+            background: #FF0000;
+            color: white;
+            border-color: #FF0000;
+            transform: translateY(-2px);
+        }
+
+        .progress-container {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e1e5e9;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF0000, #FF4444);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .download-info {
+            display: none;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #FF0000;
+        }
+
+        .download-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .download-item:last-child {
+            border-bottom: none;
+        }
+
+        .format-icon {
+            font-size: 20px;
+            color: #FF0000;
+        }
+
+        .features {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .feature-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .logo {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <i class="fab fa-youtube"></i>
+        </div>
+        <h1>YT Downloader</h1>
+        <p style="color: #666; margin-bottom: 20px;">Download YouTube videos in 1080p quality</p>
+        
+        <div class="input-group">
+            <i class="fas fa-link input-icon"></i>
+            <input type="url" class="url-input" id="videoUrl" placeholder="Paste YouTube video URL here...">
+        </div>
+
+        <div class="quality-selector">
+            <button class="quality-btn active" data-quality="1080p">
+                <i class="fas fa-hd-desktop"></i> 1080p
+            </button>
+            <button class="quality-btn" data-quality="720p">
+                <i class="fas fa-desktop"></i> 720p
+            </button>
+            <button class="quality-btn" data-quality="audio">
+                <i class="fas fa-music"></i> MP3
+            </button>
+        </div>
+
+        <button class="download-btn" id="downloadBtn">
+            <i class="fas fa-download"></i> Analyze & Download
+        </button>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Preparing download...</div>
+        </div>
+
+        <div class="download-info" id="downloadInfo">
+            <h3><i class="fas fa-check-circle"></i> Download Options</h3>
+            <div class="download-item">
+                <span>1080p MP4 (Best Quality)</span>
+                <a href="#" class="format-icon" download><i class="fas fa-download"></i></a>
+            </div>
+            <div class="download-item">
+                <span>720p MP4</span>
+                <a href="#" class="format-icon" download><i class="fas fa-download"></i></a>
+            </div>
+            <div class="download-item">
+                <span>MP3 Audio</span>
+                <a href="#" class="format-icon" download><i class="fas fa-download"></i></a>
+            </div>
+        </div>
+
+        <div class="features">
+            <h3 style="margin-bottom: 15px; color: #333;">✨ Features</h3>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> 1080p Full HD Quality</li>
+                <li><i class="fas fa-check"></i> Fast Download Speed</li>
+                <li><i class="fas fa-check"></i> MP4 & MP3 Support</li>
+                <li><i class="fas fa-check"></i> No Watermarks</li>
+                <li><i class="fas fa-check"></i> Free Forever</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            For educational purposes only. Respect YouTube's Terms of Service.
+        </div>
+    </div>
+
+    <script>
+        // Demo functionality (frontend only)
+        const downloadBtn = document.getElementById('downloadBtn');
+        const videoUrl = document.getElementById('videoUrl');
+        const qualityBtns = document.querySelectorAll('.quality-btn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const downloadInfo = document.getElementById('downloadInfo');
+
+        // Quality selector
+        qualityBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                qualityBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Download button
+        downloadBtn.addEventListener('click', () => {
+            const url = videoUrl.value.trim();
+            if (!url) {
+                alert('Please enter a YouTube URL');
+                return;
+            }
+
+            // Simulate download process
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            
+            progressContainer.style.display = 'block';
+            simulateDownload();
+        });
+
+        function simulateDownload() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `Processing... ${Math.round(progress)}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    completeDownload();
+                }
+            }, 200);
+        }
+
+        function completeDownload() {
+            progressText.textContent = 'Download ready!';
+            setTimeout(() => {
+                progressContainer.style.display = 'none';
+                downloadInfo.style.display = 'block';
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Another';
+                videoUrl.value = '';
+            }, 1000);
+        }
+
+        // Auto-focus input
+        videoUrl.focus();
+
+        // Example URL on paste
+        videoUrl.addEventListener('paste', (e) => {
+            setTimeout(() => {
+                const url = videoUrl.value;
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    downloadBtn.style.background = 'linear-gradient(45deg, #00C851, #007E33)';
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
